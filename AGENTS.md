@@ -29,13 +29,14 @@
 │   ├── prepare.sh          # 预处理脚本
 │   └── start.sh            # 生产环境启动脚本
 ├── src/
-│   ├── app/                # 页面路由与布局（page.tsx 三 Tab：成绩单/录入/细则）
+│   ├── app/                # 页面路由与布局（page.tsx 四 Tab：成绩单/录入/细则/AI助手）
 │   ├── app/api/            # REST API
 │   │   ├── records/        # GET 列表 / POST 新增；[id]/ PATCH 审核 / DELETE 删除
 │   │   ├── score/          # GET 计算综测得分（含各模块明细、计入/剔除记录）
 │   │   └── rules/          # GET 规则元数据（供前端动态渲染表单）
+│   │   └── chat/           # AI 问答接入点：coze-coding-dev-sdk 流式对话，模型在文件顶部 MODEL 常量改
 │   ├── components/ui/      # Shadcn UI 组件库
-│   ├── components/zongce/  # 业务组件（transcript-view / record-form / records-table / rules-view）
+│   ├── components/zongce/  # 业务组件（transcript-view / record-form / records-table / rules-view / ai-assistant）
 │   ├── lib/
 │   │   ├── rules.ts        # ★ 规则引擎核心：九模块分值表、封顶、去重、团队减半配置
 │   │   ├── scoring.ts      # 计分逻辑：只算 approved、按分值表取分、封顶、去重、减半

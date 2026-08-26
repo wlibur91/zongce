@@ -8,6 +8,7 @@ import { RecordForm } from '@/components/zongce/record-form';
 import { RecordsTable } from '@/components/zongce/records-table';
 import { RulesView } from '@/components/zongce/rules-view';
 import { TranscriptView } from '@/components/zongce/transcript-view';
+import { AiAssistant } from '@/components/zongce/ai-assistant';
 import { computeScore } from '@/lib/scoring';
 import type { ActivityRecord } from '@/lib/types';
 
@@ -91,6 +92,7 @@ export default function Home() {
                 )}
               </TabsTrigger>
               <TabsTrigger value="rules">评分规则</TabsTrigger>
+              <TabsTrigger value="assistant">AI 助手</TabsTrigger>
             </TabsList>
 
             <TabsContent value="transcript">
@@ -107,6 +109,10 @@ export default function Home() {
 
             <TabsContent value="rules">
               <RulesView />
+            </TabsContent>
+
+            <TabsContent value="assistant">
+              <AiAssistant />
             </TabsContent>
           </Tabs>
         )}
