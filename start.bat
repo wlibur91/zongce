@@ -1,0 +1,2 @@
+@echo off
+start "" "https://0a11d23e-9667-4e6c-a255-9fb0ba7832f4.dev.coze.site"
