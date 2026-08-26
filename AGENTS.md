@@ -1,5 +1,15 @@
 # 项目上下文
 
+## 项目概述
+
+**智慧曲园 · 第二课堂综测计算器**：基于《曲阜师范大学"智慧曲园"第二课堂成绩单制度》文件（见 `assets/第二课堂评分细则.docx`）实现的综合测评计算系统。学生按九大模块录入活动记录，系统按规则引擎自动计算综测得分并生成"第二课堂成绩单"。
+
+核心业务规则（源自文件）：
+- 九大模块：社会实践（每假期一次、按档计分）、志愿服务（按时长计分）、各级表彰（不含奖学金、同事项不累计、团队减半）、科研创作、文体活动、学术竞赛、等级证书、宣传作品（同文章不累计）、其他加分项
+- 只有 `approved` 状态的记录参与计分；每模块有封顶分；总分满分 87（35/55/75 三档等级线）
+- 审核流转：pending → approved / rejected（模拟"谁主办、谁审核"）
+- 注：原文件未含具体分值表，规则引擎中的分值为按文件描述构建的合理默认值，集中在 `src/lib/rules.ts` 可查可改
+
 ### 版本技术栈
 
 - **Framework**: Next.js 16 (App Router)
@@ -11,23 +21,50 @@
 ## 目录结构
 
 ```
-├── public/                 # 静态资源
+├── assets/                 # 需求源文件（评分细则 docx）
+├── data/                   # 运行时数据（records.json，gitignore，损坏/缺失时自动重置为种子数据）
 ├── scripts/                # 构建与启动脚本
 │   ├── build.sh            # 构建脚本
-│   ├── dev.sh              # 开发环境启动脚本
+│   ├── dev.sh              # 开发环境启动脚本（清端口后 tsx watch src/server.ts）
 │   ├── prepare.sh          # 预处理脚本
 │   └── start.sh            # 生产环境启动脚本
 ├── src/
-│   ├── app/                # 页面路由与布局
+│   ├── app/                # 页面路由与布局（page.tsx 三 Tab：成绩单/录入/细则）
+│   ├── app/api/            # REST API
+│   │   ├── records/        # GET 列表 / POST 新增；[id]/ PATCH 审核 / DELETE 删除
+│   │   ├── score/          # GET 计算综测得分（含各模块明细、计入/剔除记录）
+│   │   └── rules/          # GET 规则元数据（供前端动态渲染表单）
 │   ├── components/ui/      # Shadcn UI 组件库
-│   ├── hooks/              # 自定义 Hooks
-│   ├── lib/                # 工具库
-│   │   └── utils.ts        # 通用工具函数 (cn)
-│   └── server.ts           # 自定义服务端入口
+│   ├── components/zongce/  # 业务组件（transcript-view / record-form / records-table / rules-view）
+│   ├── lib/
+│   │   ├── rules.ts        # ★ 规则引擎核心：九模块分值表、封顶、去重、团队减半配置
+│   │   ├── scoring.ts      # 计分逻辑：只算 approved、按分值表取分、封顶、去重、减半
+│   │   ├── store.ts        # 文件存储（data/records.json）：串行化写锁 + tmp/rename 原子写 + 损坏自愈
+│   │   └── types.ts        # ActivityRecord / ScoreResult 等类型
+│   └── server.ts           # 自定义服务端入口（tsx watch）
 ├── next.config.ts          # Next.js 配置
 ├── package.json            # 项目依赖管理
+├── DESIGN.md               # 设计风格文档（档案纸/印章红主题）
 └── tsconfig.json           # TypeScript 配置
 ```
+
+## 关键入口 / 核心模块
+
+- 改分值/档位/封顶：`src/lib/rules.ts`（MODULE_MAP，纯配置）
+- 改计分逻辑：`src/lib/scoring.ts`
+- API 均为 `force-dynamic`，数据持久化在 `data/records.json`（首次访问自动写入 5 条种子演示数据）
+
+## 运行与预览
+
+- 预览：`.coze [dev]` → `scripts/build.sh` + `scripts/dev.sh`，端口读 `.preview`（5000）
+- 本地开发：`pnpm dev`（dev.sh 自带端口清理，勿手动起多个 dev 实例）
+- 验收：test_run（lint + ts-check + 探活 + 全接口 curl 冒烟）
+
+## 常见问题和预防
+
+- **勿并行起多个 dev server**：两个 `tsx watch` 实例交叉写 `data/records.json` 会导致数据损坏/写丢失（已踩坑）。store 已加串行写锁 + 原子写 + 损坏自愈，但仍应保持单实例。
+- `data/` 已加入 `.gitignore`，勿提交运行时数据。
+- 前端调用后端一律相对路径 `/api/...`。
 
 - 项目文件（如 app 目录、pages 目录、components 等）默认初始化到 `src/` 目录下。
 
