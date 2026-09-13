@@ -1,27 +1,46 @@
 @echo off
 cd /d "%~dp0"
+title ZongCe Calculator
 
-where node >nul 2>&1
+node -v >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [ERROR] Node.js not found. Please install Node.js first.
-    echo Download: https://nodejs.org/
+    echo.
+    echo ============================================
+    echo   Node.js is NOT installed!
+    echo   Please install Node.js first.
+    echo   Download: https://nodejs.org/en/download
+    echo   Choose LTS version, then click Next
+    echo   to install everything with defaults.
+    echo ============================================
+    echo.
+    start https://nodejs.org/en/download
     pause
     exit /b 1
 )
 
-where pnpm >nul 2>&1
+echo Node.js detected: 
+node -v
+
+npm -v >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [INFO] pnpm not found, installing...
-    call npm install -g pnpm
+    echo.
+    echo npm not found, something is wrong with Node.js installation.
+    pause
+    exit /b 1
 )
 
 if not exist "node_modules" (
-    echo [INFO] Installing dependencies...
+    echo.
+    echo Installing pnpm...
+    call npm install -g pnpm
+    echo.
+    echo Installing dependencies...
     call pnpm install
 )
 
-echo [INFO] Starting dev server...
-start "SmartQY" cmd /k "cd /d %~dp0 && node node_modules\next\dist\bin\next dev --port 5000 --turbopack"
-echo [INFO] Waiting for server to start...
-ping -n 10 127.0.0.1 >nul
-explorer "http://localhost:5000"
+echo.
+echo Starting server, browser will open shortly...
+start "" /D "%~dp0" node node_modules\next\dist\bin\next dev --port 3000 --turbopack
+ping -n 12 127.0.0.1 >nul
+start http://localhost:3000
+echo Done!
