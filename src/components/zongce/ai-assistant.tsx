@@ -5,7 +5,7 @@ const CHAT_URL = 'https://xingduo.qfnu.edu.cn/aiApp/XXCPHD304I';
 export function AiAssistant() {
   return (
     <div className="flex h-[calc(100vh-13rem)] min-h-[28rem] flex-col items-center justify-center rounded-lg border border-stone-200 bg-white/70 shadow-sm overflow-hidden gap-6 p-8 text-center">
-      <div className="text-6xl">🤖</div>
+      <img src="/微信图片_20260614234948.jpg" alt="AI 助手" className="w-24 h-24 rounded-full object-cover" />
       <h2 className="text-xl font-semibold text-stone-700">综测计算助手</h2>
       <p className="text-stone-500 max-w-md">
         点击下方按钮，即可在新窗口中打开杏铎AI综测计算助手，获取智能问答和综测计算帮助。
